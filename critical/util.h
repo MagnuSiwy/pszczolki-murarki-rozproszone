@@ -14,9 +14,9 @@ typedef struct {
 
 /* Typy wiadomości */
 /* TYPY PAKIETÓW */
-#define ACK     1
-#define REQUEST 2
-#define RELEASE 3
+#define REED_ACK     1
+#define REED_REQUEST 2
+#define REED_RELEASE 3
 #define APP_PKT 4
 #define FINISH  5
 
@@ -26,7 +26,7 @@ void inicjuj_typ_pakietu();
 /* wysyłanie pakietu, skrót: wskaźnik do pakietu (0 oznacza stwórz pusty pakiet), do kogo, z jakim typem */
 void sendPacket(packet_t *pkt, int destination, int tag);
 
-typedef enum {InRun, InMonitor, InWant, InSection, InFinish} state_t;
+typedef enum {InRunReed, WaitForReed, OnReed, InRunFlower, WaitForFlower, OnFlower, Dead} state_t;
 extern state_t stan;
 extern pthread_mutex_t stateMut;
 /* zmiana stanu, obwarowana muteksem */

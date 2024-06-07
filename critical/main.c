@@ -13,6 +13,10 @@
  */
 int rank, size;
 int ackCount = 0;
+int zegar = 0;
+int deadBees = 0;
+int reedsNum = REEDS_NUM;
+int flowerNum = FLOWER_NUM;
 /* 
  * Każdy proces ma dwa wątki - główny i komunikacyjny
  * w plikach, odpowiednio, watek_glowny.c oraz (siurpryza) watek_komunikacyjny.c
@@ -21,12 +25,14 @@ int ackCount = 0;
  */
 
 pthread_t threadKom;
+pthread_mutex_t clock_mutex = PTHREAD_MUTEX_INITIALIZER;
+//pthread_mutex_t bee_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void finalizuj()
 {
     pthread_mutex_destroy( &stateMut);
     /* Czekamy, aż wątek potomny się zakończy */
-    println("czekam na wątek \"komunikacyjny\"\n" );
+    println("Pszczoła umiera\n" );
     pthread_join(threadKom,NULL);
     MPI_Type_free(&MPI_PAKIET_T);
     MPI_Finalize();
@@ -78,7 +84,9 @@ int main(int argc, char **argv)
      * w vi najedź kursorem na nazwę pliku i wciśnij klawisze gf
      * powrót po wciśnięciu ctrl+6
      * */
-    mainLoop();
+    mainLoop(); // możesz także wcisnąć ctrl-] na nazwie funkcji
+		// działa, bo używamy ctags (zob Makefile)
+		// jak nie działa, wpisz set tags=./tags :)
     
     finalizuj();
     return 0;

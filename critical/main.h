@@ -17,14 +17,20 @@
 
 #define ROOT 0
 
+#define REEDS_NUM 2
+#define FLOWER_NUM 1
+
 /* tutaj TYLKO zapowiedzi - definicje w main.c */
 extern int rank;
 extern int size;
 extern int ackCount;
+extern int deadBees;
+extern int reedsNum;
+extern int flowerNum;
 extern pthread_t threadKom;
+extern int zegar;
 
-
-
+extern pthread_mutex_t clock_mutex;
 
 
 /* macro debug - działa jak printf, kiedy zdefiniowano
@@ -46,13 +52,13 @@ extern pthread_t threadKom;
                                             
 */
 #ifdef DEBUG
-#define debug(FORMAT,...) printf("%c[%d;%dm [%d]: " FORMAT "%c[%d;%dm\n",  27, (1+(rank/7))%2, 31+(6+rank)%7, rank, ##__VA_ARGS__, 27,0,37);
+#define debug(FORMAT,...) printf("%c[%d;%dm [%d] [zegar: %d]: " FORMAT "%c[%d;%dm\n",  27, (1+(rank/7))%2, 31+(6+rank)%7, rank, zegar, ##__VA_ARGS__, 27,0,37);
 #else
 #define debug(...) ;
 #endif
 
 // makro println - to samo co debug, ale wyświetla się zawsze
-#define println(FORMAT,...) printf("%c[%d;%dm [%d]: " FORMAT "%c[%d;%dm\n",  27, (1+(rank/7))%2, 31+(6+rank)%7, rank, ##__VA_ARGS__, 27,0,37);
+#define println(FORMAT,...) printf("%c[%d;%dm [%d] [zegar: %d]: " FORMAT "%c[%d;%dm\n",  27, (1+(rank/7))%2, 31+(6+rank)%7, rank, zegar, ##__VA_ARGS__, 27,0,37);
 
 
 #endif

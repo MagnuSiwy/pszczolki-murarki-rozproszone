@@ -6,7 +6,7 @@ MPI_Datatype MPI_PAKIET_T;
  * w util.h extern state_t stan (czyli zapowiedź, że gdzieś tam jest definicja
  * tutaj w util.c state_t stan (czyli faktyczna definicja)
  */
-state_t stan=InRun;
+state_t stan=InRunReed;
 
 /* zamek wokół zmiennej współdzielonej między wątkami. 
  * Zwróćcie uwagę, że każdy proces ma osobą pamięć, ale w ramach jednego
@@ -19,9 +19,9 @@ struct tagNames_t{
     const char *name;
     int tag;
 } tagNames[] = { { "pakiet aplikacyjny", APP_PKT }, { "finish", FINISH}, 
-                { "potwierdzenie", ACK}, {"prośbę o sekcję krytyczną", REQUEST}, {"zwolnienie sekcji krytycznej", RELEASE} };
+                { "potwierdzenie", REED_ACK}, {"prośbę o sekcję krytyczną", REED_REQUEST}, {"zwolnienie sekcji krytycznej", REED_RELEASE} };
 
-const char const *tag2string( int tag )
+const char *const tag2string( int tag )
 {
     for (int i=0; i <sizeof(tagNames)/sizeof(struct tagNames_t);i++) {
 	if ( tagNames[i].tag == tag )  return tagNames[i].name;
@@ -56,6 +56,12 @@ void sendPacket(packet_t *pkt, int destination, int tag)
     int freepkt=0;
     if (pkt==0) { pkt = malloc(sizeof(packet_t)); freepkt=1;}
     pkt->src = rank;
+    
+    pthread_mutex_lock(&clock_mutex);
+    zegar++;
+    pkt->ts = zegar;
+    pthread_mutex_unlock(&clock_mutex);
+
     MPI_Send( pkt, 1, MPI_PAKIET_T, destination, tag, MPI_COMM_WORLD);
     debug("Wysyłam %s do %d\n", tag2string( tag), destination);
     if (freepkt) free(pkt);
@@ -64,7 +70,7 @@ void sendPacket(packet_t *pkt, int destination, int tag)
 void changeState( state_t newState )
 {
     pthread_mutex_lock( &stateMut );
-    if (stan==InFinish) { 
+    if (stan==Dead) { 
 	pthread_mutex_unlock( &stateMut );
         return;
     }
